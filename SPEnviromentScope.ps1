@@ -1,7 +1,7 @@
 param (
     [switch]$loadAllItems = $false,
     [switch]$includePersonalSites = $true,
-    [switch]$mySiteHostUrl = $null
+    [String]$mySiteHostUrl = $null
  )
 
 if((Get-PSSnapin | Where {$_.Name -eq "Microsoft.SharePoint.PowerShell"})-eq $null)
@@ -25,7 +25,8 @@ Write-Host -ForegroundColor Yellow "$(get-date -format g) - Using $outfile to lo
 
 $WebApps = Get-SPWebApplication
 
-if($mySiteHostUrl -ne $nul -and -not ($mySiteHostUrl.endswith("/")))
+
+if($mySiteHostUrl -ne $null -and -not ($mySiteHostUrl.endswith("/")))
 {
         $mySiteHostUrl = $mySiteHostUrl+"/"
 }
