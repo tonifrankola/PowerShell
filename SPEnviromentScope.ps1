@@ -1,6 +1,6 @@
-﻿
 param (
-    [switch]$all = $false
+    [switch]$loadAllItems = $false
+    [switch]$includePersonalSites = $false
  )
 
 if((Get-PSSnapin | Where {$_.Name -eq "Microsoft.SharePoint.PowerShell"})-eq $null)
@@ -34,18 +34,14 @@ foreach ($WebApp in $WebApps)
     {
 
         $SizeInKB = $Site.Usage.Storage
-
         $SizeInGB = $SizeInKB/1024/1024/1024
-    
         $SizeInGB = [math]::Round($SizeInGB,2)
-
 
         $webAppDisplayName = Get-StringHash $WebApp.DisplayName
         $siteUrl = Get-StringHash $Site.URL
         $contentDatabaseName = Get-StringHash $Site.ContentDatabase.Name
 
-
-        if($all -eq $true)
+        if($loadAllItems -eq $true)
         {
             $i=0
             $websCount = 0;
@@ -57,12 +53,8 @@ foreach ($WebApp in $WebApps)
                 {
                     foreach ($SPList in $SPWeb.Lists)
                     {
-                        foreach ($SPListItem in $SPList.Items)
-                        {
-                            $i=$i+1 
-                        }
-                
-                        $listsCount++; 
+                       $i= $i + $SPList.ItemCount
+                       $listsCount++; 
                     }
 
                     $websCount++;
@@ -84,7 +76,6 @@ foreach ($WebApp in $WebApps)
         }
 
         $Site.dispose()
-
 
         $webAppDisplayName + "," + $siteUrl + "," + $contentDatabaseName + "," + $SizeInGB + "," + $websCount + "," + $listsCount + "," + $i | Out-File $outFile -Append
     }
