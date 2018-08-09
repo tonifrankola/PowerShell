@@ -1,5 +1,5 @@
 param (
-    [switch]$loadAllItems = $false
+    [switch]$loadAllItems = $false,
     [switch]$includePersonalSites = $false
  )
 
@@ -18,7 +18,7 @@ Function Get-StringHash([String] $String, $HashName = "MD5")
 
 $outFile = "$(get-date -f yyyy-MM-dd-HH-mm-ss).csv"
 
-Write-Host -ForegroundColor Yellow "Using $outfile to log progress."
+Write-Host -ForegroundColor Yellow "$(get-date -format g) - Using $outfile to log progress."
 
 "Web Application, Site Collection, Database Name, Size, Web Count, Lists Count, Items Count" | Out-File $outFile -Append
 
@@ -82,4 +82,4 @@ foreach ($WebApp in $WebApps)
 
 }
 
-Write-Host -ForegroundColor Green "Data writen to $outfile."
+Write-Host -ForegroundColor Green "$(get-date -format g) - Data writen to $outfile."
