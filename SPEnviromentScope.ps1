@@ -1,6 +1,6 @@
 param (
     [switch]$loadAllItems = $false,
-    [switch]$includePersonalSites = $true,
+    [switch]$itemCountncludePersonalSites = $true,
     [String]$mySiteHostUrl = $null
  )
 
@@ -21,7 +21,7 @@ $outFile = "$(get-date -f yyyy-MM-dd-HH-mm-ss).csv"
 
 Write-Host -ForegroundColor Yellow "$(get-date -format g) - Using $outfile to log progress."
 
-"Web Application, My Site, Site Collection, Database Name, Size, Webs Count, Lists Count, Items Count" | Out-File $outFile -Append
+"Web Application, My Site, Site Collection, Database Name, Size, Users Count, Webs Count, Lists Count, Items Count" | Out-File $outFile -Append
 
 $WebApps = Get-SPWebApplication
 
@@ -35,14 +35,14 @@ foreach ($WebApp in $WebApps)
 {
     if($mySiteHostUrl -ne $null)
     {
-        $isMySiteHost = $WebApp.Url -eq $mySiteHostUrl
+        $itemCountsMySiteHost = $WebApp.Url -eq $mySiteHostUrl
     }
     else
     {
-        $isMySiteHost = "Unknown"
+        $itemCountsMySiteHost = "Unknown"
     }
 
-    if($includePersonalSites -or ($isMySiteHost -eq "Unknown"))
+    if($itemCountncludePersonalSites -or ($itemCountsMySiteHost -eq "Unknown"))
     {
         $Sites = Get-SPSite -WebApplication $WebApp -Limit All
         
@@ -58,17 +58,20 @@ foreach ($WebApp in $WebApps)
 
             if($loadAllItems -eq $true)
             {
-                $i=0
+                $userCount = 0;
+                $itemCount=0;
                 $websCount = 0;
                 $listsCount = 0;
 
                 Try
                 {
+                    $userCount = $Site.RootWeb.AllUsers.Count
+
                     foreach ($SPWeb in $Site.AllWebs)
                     {
                         foreach ($SPList in $SPWeb.Lists)
                         {
-                        $i= $i + $SPList.ItemCount
+                        $itemCount= $itemCount + $SPList.ItemCount
                         $listsCount++; 
                         }
 
@@ -78,21 +81,23 @@ foreach ($WebApp in $WebApps)
                 }
                 Catch
                 {
-                    $i=-1;
+                    $userCount = -1;
+                    $itemCount=-1;
                     $websCount = -1;
                     $listsCount = -1;
                 }
             }
             else
             {
-                $i=-2;
+                $userCount = -2;
+                $itemCount=-2;
                 $websCount = -2;
                 $listsCount = -2;
             }
 
             $Site.dispose()
 
-            $webAppDisplayName + "," + $isMySiteHost + "," + $siteUrl + "," + $contentDatabaseName + "," + $SizeInGB + "," + $websCount + "," + $listsCount + "," + $i | Out-File $outFile -Append
+            $webAppDisplayName + "," + $itemCountsMySiteHost + "," + $siteUrl + "," + $contentDatabaseName + "," + $SizeInGB + "," + $userCount + "," + $websCount + "," + $listsCount + "," + $itemCount | Out-File $outFile -Append
         }        
     }
 }
