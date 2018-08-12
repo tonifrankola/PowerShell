@@ -147,6 +147,7 @@ $spPSSS = Get-PSSnapin | Where-Object{$_.Name -eq "Microsoft.SharePoint.PowerShe
 if($null -ne $spPSSS)
 {
     Get-SPEnvironmentScope
+}
 else
 {
     Write-Host -ForegroundColor Red "This script needs to run on a SharePoint machine."
