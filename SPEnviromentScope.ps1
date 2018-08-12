@@ -23,10 +23,10 @@
 .EXAMPLE
     .\SPEnvironmentScope.ps1
     Loads SharePoint environment with the default settings. Only lists site collections without retrieving subsites and list items.
-
+.EXAMPLE
     .\SPEnvironmentScope.ps1 -LoadAllSubsites $true
     Loads SharePoint environment including subsites
-    
+.EXAMPLE
     .\SPEnvironmentScope.ps1 -LoadAllSubsites $true -LoadPersonalSites $false -MySiteHostUrl "https://mysite.company.com"
     Loads SharePoint environment including subsites
 #>
