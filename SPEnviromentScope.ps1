@@ -14,6 +14,10 @@
 .PARAMETER MySiteHostUrl
     String - e.g. "https://mysite.company.com" - used to filter-out all Personal (My) sites. Required if filtering is LoadPersonalSites is set to false.
 
+.PARAMETER DataMasking
+    Boolean - is set to True (default) it will mask all the web applications, site collections and content databases names and/or URLs. 
+
+
 .NOTES  
     File Name  : SPEnviromentScope.ps1  
     Author     : Toni Frankola
@@ -29,13 +33,17 @@
 .EXAMPLE
     .\SPEnvironmentScope.ps1 -LoadAllSubsites $true -LoadPersonalSites $false -MySiteHostUrl "https://mysite.company.com"
     Loads SharePoint environment including subsites
+.EXAMPLE
+    .\SPEnvironmentScope.ps1 -LoadAllSubsites $true -DataMasking $false
+    Loads SharePoint environment including subsites but it does not mask the names
 #>
 
 
 param (
-    [switch]$LoadAllSubsites = $false,
-    [switch]$LoadPersonalSites = $true,
-    [String]$MySiteHostUrl = $null
+    [Boolean]$LoadAllSubsites = $false,
+    [Boolean]$LoadPersonalSites = $true,
+    [String]$MySiteHostUrl = $null,
+    [Boolean]$DataMasking = $true
  )
 
 Function Get-StringHash([String] $string, $hashName = "MD5") 
@@ -55,7 +63,7 @@ Function Get-SPEnvironmentScope()
 
     "Web Application, My Site, Site Collection, Database Name, Size, Users Count, Webs Count, Lists Count, Items Count" | Out-File $outFile -Append
 
-    if($MySiteHostUrl -ne $null -and -not ($MySiteHostUrl.endswith("/")))
+    if($MySiteHostUrl -and -not ($MySiteHostUrl.endswith("/")))
     {
             $MySiteHostUrl = $MySiteHostUrl+"/"
     }
@@ -65,7 +73,7 @@ Function Get-SPEnvironmentScope()
         $WebApps = Get-SPWebApplication
         foreach ($WebApp in $WebApps)
         {
-            if($MySiteHostUrl -ne $null)
+            if($MySiteHostUrl)
             {
                 $itemCountsMySiteHost = $WebApp.Url -eq $MySiteHostUrl
             }
@@ -84,9 +92,19 @@ Function Get-SPEnvironmentScope()
                     $SizeInGB = $SizeInKB/1024/1024/1024
                     $SizeInGB = [math]::Round($SizeInGB,2)
 
-                    $webAppDisplayName = Get-StringHash $WebApp.DisplayName
-                    $siteUrl = Get-StringHash $Site.URL
-                    $contentDatabaseName = Get-StringHash $Site.ContentDatabase.Name
+
+                    if($DataMasking -eq $true)
+                    {
+                        $webAppDisplayName = Get-StringHash $WebApp.DisplayName
+                        $siteUrl = Get-StringHash $Site.URL
+                        $contentDatabaseName = Get-StringHash $Site.ContentDatabase.Name
+                    }
+                    else
+                    {
+                        $webAppDisplayName = $WebApp.DisplayName
+                        $siteUrl =$Site.URL
+                        $contentDatabaseName = $Site.ContentDatabase.Name
+                    }
 
                     if($LoadAllSubsites -eq $true)
                     {
